@@ -34,6 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
+        String internalName = getAlreadyFilteredAttributeName();
+
+        System.out.println("Checking attribute: " + internalName );
+        System.out.println("Value before processing "+ request.getAttribute(internalName));
 
         // 2. Check if the header is missing or doesn't start with "Bearer "
         if (authHeader == null || !authHeader.startsWith("Bearer ")){
