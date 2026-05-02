@@ -6,10 +6,7 @@ import com.salihin.ecommerce.dto.RegisterRequest;
 import com.salihin.ecommerce.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 @RestController
@@ -17,19 +14,24 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-    private final AuthenticationService service;
+    private final AuthenticationService authService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        return ResponseEntity.ok(service.register(request));
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @Valid @RequestBody AuthenticationRequest request
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        return ResponseEntity.ok(authService.authenticate(request));
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Hello! You are authenticated!");
     }
 }
