@@ -17,12 +17,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        // Check if user already exists
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("User with this email already exists");
+        }
+
         // 1. Create a new user from the request
         var user = User.builder()
                 .name(request.getName())
@@ -32,7 +37,7 @@ public class AuthenticationService {
                 .build();
 
         // 2. Save the user to the database
-        repository.save(user);
+        userRepository.save(user);
 
         // 3. Generate a JWT token for the new user
         var jwtToken = jwtService.generateToken(user);
@@ -53,7 +58,7 @@ public class AuthenticationService {
         );
 
         // 2. If we reach here, the user is authenticated. Fetch the user from the DB
-        var user = repository.findByEmail(request.getEmail())
+        var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
 
         // 3. Generate a new JWT token

@@ -26,7 +26,17 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // 1. WhiteList the auth endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
+
+                        // 2. Secure the Product endpoints based on roles!!
+                        // Allow any authenticated user (CUSTOMER or ADMIN) to GET products
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/products/**").authenticated()
+
+                        // Only allow ADMIN to POST, PUT, or DELETE products
+                        .requestMatchers("/api/v1/products/**").hasRole("ADMIN")
+
+                        // 3. Any other request must be authenticated
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
