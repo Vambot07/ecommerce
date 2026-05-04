@@ -7,6 +7,8 @@ import com.salihin.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -38,5 +40,42 @@ public class ProductService {
                 .createdAt(product.getCreatedAt())
                 .updateAt(product.getUpdatedAt())
                 .build();
+    }
+
+    public List<ProductResponse> findAllProduct() {
+        List<Product> products = productRepository.findAll();
+
+        // Use Java Stream to map each Product entity to a ProductResponse DTO
+        return products.stream()
+                .map(this::mapToProductResponse)
+                .toList(); // ATAU pun .collect(Collectors.toList);
+    }
+
+    public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
+        // 1. Find the product or throw an exception if not found
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+
+
+        // 2. Update the fields
+        product.setName(productRequest.getName());
+        product.setDescription(productRequest.getDescription());
+        product.setPrice(productRequest.getPrice());
+        product.setStockQuantity(productRequest.getStockQuantity());
+
+        // 3. Save the updated product back to the database
+        Product updatedProduct = productRepository.save(product);
+
+        // 4. Return the mapped response
+        return mapToProductResponse(updatedProduct);
+    }
+
+    public void deleteProduct(Long productId) {
+        // 1. Check if the product exists
+        if(!productRepository.existsById(productId)) {
+            throw new RuntimeException("Product not found with id: " + productId);
+        }
+        // 2. Delete it
+        productRepository.deleteById(productId);
     }
 }
