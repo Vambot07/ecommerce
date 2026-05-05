@@ -36,7 +36,13 @@ public class SecurityConfiguration {
                         // Only allow ADMIN to POST, PUT, or DELETE products
                         .requestMatchers("/api/v1/products/**").hasRole("ADMIN")
 
-                        // 3. Any other request must be authenticated
+                        // 3. Cart endpoints - accessible to any authenticated user
+                        .requestMatchers("/api/v1/cart/**").authenticated()
+
+                        // 4. Order endpoints - accessible to any authenticated user
+                        .requestMatchers("/api/v1/orders/**").authenticated()
+
+                        // 5. Any other request must be authenticated
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
